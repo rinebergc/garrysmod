@@ -1,0 +1,14 @@
+{
+	"title": "Lucky Coin [TTT]",
+	"type":	"weapon",
+	"tags":	["fun"],
+	"ignore":
+	[
+		"*.gitignore*",
+		"*.gma",
+		"*.jpg",
+		"*.md",
+		"*.vscode",
+		".git*"
+	]
+}

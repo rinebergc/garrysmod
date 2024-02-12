@@ -1,0 +1,14 @@
+{
+	"title": "TTT Randommat 2.0 - \"Air Ride\" Event",
+	"type":	"ServerContent",
+	"tags":	["fun"],
+	"ignore":
+	[
+		"*.gitignore*",
+		"*.gma",
+		"*.jpg",
+		"*.md",
+		"*.vscode",
+		".git*"
+	]
+}

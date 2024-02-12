@@ -1,0 +1,14 @@
+{
+	"title": "The Gun Gun [TTT]",
+	"type":	"weapon",
+	"tags":	["fun"],
+	"ignore":
+	[
+		"*.gitignore*",
+		"*.gma",
+		"*.jpg",
+		"*.md",
+		"*.vscode",
+		".git*"
+	]
+}
