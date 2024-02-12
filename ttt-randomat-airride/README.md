@@ -12,7 +12,7 @@ Adds a new event that gives each player a Detective Toy Car and randomly turns t
 [Kirby Star Allies' Meta Knight P.M.](https://steamcommunity.com/sharedfiles/filedetails/?id=1526298315) - Required playermodel.\
 [[SSBUlt] King Dedede P.M.](https://steamcommunity.com/sharedfiles/filedetails/?id=1611899249) - Required playermodel.
 
-## Special Thanks
+## General
 * [Oshawott82](https://steamcommunity.com/id/Oshawott82]Oshawott82) and [Some Templar](https://steamcommunity.com/id/SomeTemplar) for the idea for this event.
 * [Nodnarb2004](https://steamcommunity.com/id/Nodnarb2004) and [The Stig](https://steamcommunity.com/id/The-Stig-294) for the original Cozy Coupe and the Detective Toy Car respectively.
 * [4CE](https://steamcommunity.com/id/senranx) for the Kirby playermodels.
