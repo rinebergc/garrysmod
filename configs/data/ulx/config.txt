@@ -1,0 +1,32 @@
+ulx chattime 0
+
+ulx kickAfterNameChangesCooldown 0
+ulx kickAfterNameChangesWarning 0
+
+ulx logChat 0
+ulx logDir "ulx_logs"
+ulx logEcho 0
+ulx logEvents 0
+ulx logFile 0
+ulx logJoinLeaveEcho 0
+ulx logSpawns 0
+ulx logSpawnsEcho -1
+
+ulx meChatEnabled 2
+ulx motdfile ""
+ulx motdurl ""
+
+ulx rslots 0
+ulx rslotsMode 0
+ulx rslotsVisible 0
+
+ulx showMotd 0
+
+ulx votebanMinvotes 4
+ulx votebanSuccessratio 1
+ulx voteEcho 0
+ulx votekickMinvotes 2
+ulx votekickSuccessratio 0.5
+ulx votemapEnabled 0
+
+ulx welcomemessage ""
