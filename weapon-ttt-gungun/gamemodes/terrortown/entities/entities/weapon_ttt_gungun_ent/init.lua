@@ -1,7 +1,5 @@
-AddCSLuaFile( "cl_init.lua" )
-AddCSLuaFile( "shared.lua" )
-
-include( "shared.lua" )
+AddCSLuaFile("shared.lua")
+include("shared.lua")
 
 ENT.GunModels = {
 	{"models/weapons/w_pist_elite_single.mdl", "weapons/elite/elite-1.wav", 38}, 

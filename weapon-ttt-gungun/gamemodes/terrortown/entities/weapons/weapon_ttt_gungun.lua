@@ -1,6 +1,17 @@
 AddCSLuaFile()
 
-SWEP.HoldType = "rpg"
+local cvar_automatic = CreateConVar("ttt_gungun_automatic", "0", FCVAR_ARCHIVE + FCVAR_NOTIFY)
+local cvar_clip_max = CreateConVar("ttt_gungun_clipmax", "50", FCVAR_ARCHIVE + FCVAR_NOTIFY)
+local cvar_clip_size = CreateConVar("ttt_gungun_clipsize", "50", FCVAR_ARCHIVE + FCVAR_NOTIFY)
+local cvar_default_clip = CreateConVar("ttt_gungun_defaultclip", "50", FCVAR_ARCHIVE + FCVAR_NOTIFY)
+local cvar_delay = CreateConVar("ttt_gungun_delay", "0.125", FCVAR_ARCHIVE + FCVAR_NOTIFY)
+local cvar_limited_stock = CreateConVar("ttt_gungun_limitedstock", "1", FCVAR_ARCHIVE + FCVAR_NOTIFY)
+
+
+if SERVER then
+    resource.AddFile("materials/VGUI/ttt/icon_rpg.vmt")
+end
+
 
 if CLIENT then
     SWEP.PrintName = "The Gun Gun"
@@ -10,62 +21,81 @@ if CLIENT then
     SWEP.ViewModelFOV = 54
     SWEP.DrawCrosshair = false
 
+    SWEP.Icon = "vgui/ttt/icon_rpg"
     SWEP.EquipMenuData = {
         type = "Weapon",
         desc = "A gun that shoots guns that shoot."
-    };
-
-    SWEP.Icon = "vgui/ttt/icon_rpg"
+    }
 end
 
-if SERVER then
-    resource.AddFile("materials/VGUI/ttt/icon_rpg.vmt")
-end
 
 SWEP.Base = "weapon_tttbase"
+SWEP.HoldType = "rpg"
 
 SWEP.UseHands = true
 SWEP.ViewModel = "models/weapons/c_rpg.mdl"
 SWEP.WorldModel = "models/weapons/w_rocket_launcher.mdl"
 
-SWEP.Primary.Delay = 0.125
-SWEP.Primary.Automatic = false
-SWEP.Primary.Ammo = "none"
-SWEP.Primary.ClipSize = 50
-SWEP.Primary.DefaultClip = 50
-SWEP.Primary.ClipMax = 50
+SWEP.Primary = {
+    Ammo = "none",
+    Automatic = cvar_automatic:GetBool(),
+    ClipMax = cvar_clip_max:GetInt(),
+    ClipSize = cvar_clip_size:GetInt(),
+    DefaultClip = cvar_default_clip:GetInt(),
+    Delay = cvar_delay:GetFloat()
+}
 
 SWEP.AllowDrop = true
-SWEP.AmmoEnt = "none"
 SWEP.AutoSpawnable = false
 SWEP.CanBuy = { ROLE_TRAITOR }
+SWEP.LimitedStock = cvar_limited_stock:GetBool()
 SWEP.InLoadoutFor = nil
+
+SWEP.AmmoEnt = "none"
 SWEP.IsSilent = false
 SWEP.Kind = WEAPON_EQUIP1
-SWEP.LimitedStock = true
 SWEP.NoSights = true
 
+
 function SWEP:PrimaryAttack()
-    if (self:CanPrimaryAttack()) then
-        self.Weapon:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
-        self:EmitSound( "weapons/ar2/ar2_altfire.wav" )
-        self.Weapon:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
-        if SERVER then
-            local gun = ents.Create("weapon_ttt_gungun_ent")
-            local vec = Vector( 0, 0, 8 )
-            local rand = math.random( 1, 21 )
-            gun:SetModel( gun.GunModels[rand][1] )
-            gun.GunSound = gun.GunModels[rand][2]
-            gun.Damage = gun.GunModels[rand][3]
-            if self.Owner:Crouching() then vec = Vector(0,0,4) end
-            gun:SetPos( ( self.Owner:EyePos() - vec ) + ( self.Owner:GetForward() * 25 ) )
-            gun:SetAngles( self.Owner:EyeAngles() )
-            gun:Spawn()
-            local gunphys = gun:GetPhysicsObject()
-            gunphys:EnableGravity( false )
-            gunphys:Wake()
-            gunphys:ApplyForceCenter(self.Owner:GetAimVector():GetNormalized() * 1000 )
-        end
-        self:TakePrimaryAmmo(1)
+    if not self:CanPrimaryAttack() then return end
+
+    local owner = self.Owner
+    self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
+    self:EmitSound("weapons/ar2/ar2_altfire.wav")
+    self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
+
+    function create_random_gun_entity(owner)
+        local gun_entity = ents.Create("weapon_ttt_gungun_ent")
+        if not gun_entity:IsValid() then return nil end
+    
+        local gun_data = gun_entity.GunModels[math.random(#gun_entity.GunModels)]
+    
+        gun_entity:SetModel(gun_data[1])
+        gun_entity.GunSound = gun_data[2]
+        gun_entity.Damage = gun_data[3]
+        
+        return gun_entity
     end
+
+    if SERVER then
+        local gun = create_random_gun_entity(owner)
+
+        if gun then
+            local offset_z = owner:Crouching() and 4 or 8
+            gun:SetPos((owner:EyePos() - Vector(0, 0, offset_z)) + (owner:GetForward() * 25))
+            gun:SetAngles(owner:EyeAngles())
+            gun:Spawn()
+            gun:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+
+            local phys = gun:GetPhysicsObject()
+            if IsValid(phys) then
+                phys:EnableGravity(false)
+                phys:Wake()
+                phys:ApplyForceCenter(owner:GetAimVector():GetNormalized() * 1000)
+            end
+        end
+    end
+
+    self:TakePrimaryAmmo(1)
 end
