@@ -26,39 +26,56 @@ ENT.GunModels = {
 }
 
 function ENT:Initialize()
-	self:SetMoveType( MOVETYPE_VPHYSICS )
-	self:SetSolid( SOLID_VPHYSICS )
-	self:PrecacheGibs()
-	if ( SERVER ) then self:PhysicsInit( SOLID_VPHYSICS ) end
-	local phys = self:GetPhysicsObject()
-	if ( IsValid( phys ) ) then phys:Wake() end
+    self:SetMoveType(MOVETYPE_VPHYSICS)
+    self:SetSolid(SOLID_VPHYSICS)
+
+    if not SERVER then return end
+
+    self:PrecacheGibs()
+    self:PhysicsInit(SOLID_VPHYSICS)
+    self:PhysWake()
 	self:SetUseType(SIMPLE_USE)
-	
-	for i=1, 60 do
-		timer.Simple( ( i / 3 ) * math.Rand( 1, 5 ), function()
-			if !IsValid( self ) then return end
-			self:EmitSound( self.GunSound )
-			phys:ApplyForceCenter( -phys:GetAngles():Forward() * 250 )
-			phys:ApplyForceOffset( VectorRand() * 200, phys:GetPos() )
+
+    local gun_sound = self.GunSound
+    local damage = self.Damage
+
+    for i = 1, 60 do
+        timer.Simple((i / 3) * math.Rand(1, 5), function()
+            if not IsValid(self) then return end
+
+            self:EmitSound(gun_sound)
+
+            local phys = self:GetPhysicsObject()
+            if IsValid(phys) then
+                local ang = phys:GetAngles()
+                phys:ApplyForceCenter(-ang:Forward() * 250)
+                phys:ApplyForceOffset(VectorRand() * 200, phys:GetPos())
+            end
+			
 			local effectdata = EffectData()
 			effectdata:SetOrigin( self:GetAttachment( 1 ).Pos )
 			effectdata:SetAngles( self:GetAngles() )
 			effectdata:SetEntity( self )
 			effectdata:SetAttachment( 1 )
 			util.Effect( "MuzzleEffect", effectdata )
-			self:FireBullets(
-				{ Damage = self.Damage, Dir = self:GetAngles():Forward(), Src = self:GetPos() }
-			)
-		end)
-	end
-	timer.Simple( 30, function()
-		if !IsValid(self) then return end
-		self:EmitSound( "physics/metal/metal_box_break" .. math.random(1,2) .. ".wav" )
-		local effectdata = EffectData()
-		effectdata:SetOrigin( self:GetPos() )
-		effectdata:SetAngles( self:GetAngles() )
-		effectdata:SetEntity( self )
-		util.Effect( "StunstickImpact", effectdata )
-		self:Remove()
-	end)
+
+            self:FireBullets({
+                Damage = damage,
+                Dir = self:GetAngles():Forward(),
+                Src = self:GetPos()
+            })
+        end)
+    end
+
+    timer.Simple(30, function()
+        if not IsValid(self) then return end
+
+        self:EmitSound("physics/metal/metal_box_break" .. math.random(1, 2) .. ".wav")
+        util.Effect("StunstickImpact", EffectData()
+            :SetOrigin(self:GetPos())
+            :SetAngles(self:GetAngles())
+            :SetEntity(self)
+        )
+        self:Remove()
+    end)
 end

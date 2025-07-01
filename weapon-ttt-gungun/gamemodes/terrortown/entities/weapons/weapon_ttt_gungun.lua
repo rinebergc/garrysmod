@@ -51,6 +51,19 @@ SWEP.Kind = WEAPON_EQUIP1
 SWEP.LimitedStock = cvar_limited_stock:GetBool()
 SWEP.NoSights = true
 
+function SWEP:CreateRandomGunEntity(owner)
+    local gun_entity = ents.Create("weapon_ttt_gungun_ent")
+    if not gun_entity:IsValid() then return nil end
+
+    local gun_data = gun_entity.GunModels[math.random(#gun_entity.GunModels)]
+
+    gun_entity:SetModel(gun_data[1])
+    gun_entity.GunSound = gun_data[2]
+    gun_entity.Damage = gun_data[3]
+    
+    return gun_entity
+end
+
 function SWEP:PrimaryAttack()
     if not self:CanPrimaryAttack() then return end
 
@@ -59,28 +72,14 @@ function SWEP:PrimaryAttack()
     self:EmitSound("weapons/ar2/ar2_altfire.wav")
     self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
 
-    function create_random_gun_entity(owner)
-        local gun_entity = ents.Create("weapon_ttt_gungun_ent")
-        if not gun_entity:IsValid() then return nil end
-    
-        local gun_data = gun_entity.GunModels[math.random(#gun_entity.GunModels)]
-    
-        gun_entity:SetModel(gun_data[1])
-        gun_entity.GunSound = gun_data[2]
-        gun_entity.Damage = gun_data[3]
-        
-        return gun_entity
-    end
-
     if SERVER then
-        local gun = create_random_gun_entity(owner)
+        local gun = self:CreateRandomGunEntity(owner)
 
         if gun then
-            local offset_z = owner:Crouching() and 4 or 8
-            gun:SetPos((owner:EyePos() - Vector(0, 0, offset_z)) + (owner:GetForward() * 25))
+            gun:SetPos((owner:EyePos() - Vector(0, 0, owner:Crouching() and 4 or 8)) + (owner:GetForward() * 25))
             gun:SetAngles(owner:EyeAngles())
+
             gun:Spawn()
-            gun:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 
             local phys = gun:GetPhysicsObject()
             if IsValid(phys) then
