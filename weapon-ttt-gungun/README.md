@@ -20,4 +20,4 @@ None
   - ttt_gungun_clipsize - Ammo per clip (Default: 50)
   - ttt_gungun_clipmax - Reserve ammo (Default: 50)
   - ttt_gungun_defaultclip - Initial ammo (Default: 50)
-  - ttt_gungun_limitedstock - Limit to one purchase per round [0/1] (Default: 0)
+  - ttt_gungun_limitedstock - Limit to one purchase per round [0/1] (Default: 1)
