@@ -13,7 +13,7 @@ None
   - It will not appear in any other gamemodes.
   - See the original for sandbox compatibility, and to give SweptThr.one the credit they deserve.
 
-## ConVars
+## Convars
 (_Map change or server restart required to take effect_)
   - ttt_gungun_delay - Fire rate (Default: 0.125)
   - ttt_gungun_automatic - Shoot automatically [0/1] (Default: 0)
