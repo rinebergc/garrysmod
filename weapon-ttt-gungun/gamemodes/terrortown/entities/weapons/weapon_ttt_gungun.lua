@@ -1,17 +1,14 @@
-AddCSLuaFile()
-
-local cvar_automatic = CreateConVar("ttt_gungun_automatic", "0", FCVAR_ARCHIVE + FCVAR_NOTIFY)
-local cvar_clip_max = CreateConVar("ttt_gungun_clipmax", "50", FCVAR_ARCHIVE + FCVAR_NOTIFY)
-local cvar_clip_size = CreateConVar("ttt_gungun_clipsize", "50", FCVAR_ARCHIVE + FCVAR_NOTIFY)
-local cvar_default_clip = CreateConVar("ttt_gungun_defaultclip", "50", FCVAR_ARCHIVE + FCVAR_NOTIFY)
-local cvar_delay = CreateConVar("ttt_gungun_delay", "0.125", FCVAR_ARCHIVE + FCVAR_NOTIFY)
-local cvar_limited_stock = CreateConVar("ttt_gungun_limitedstock", "1", FCVAR_ARCHIVE + FCVAR_NOTIFY)
-
+local cvar_delay = CreateConVar("ttt_gungun_delay", "0.125", {FCVAR_ARCHIVE, FCVAR_NOTIFY})
+local cvar_automatic = CreateConVar("ttt_gungun_automatic", "0", {FCVAR_ARCHIVE, FCVAR_NOTIFY})
+local cvar_clip_size = CreateConVar("ttt_gungun_clipsize", "50", {FCVAR_ARCHIVE, FCVAR_NOTIFY})
+local cvar_clip_max = CreateConVar("ttt_gungun_clipmax", "50", {FCVAR_ARCHIVE, FCVAR_NOTIFY})
+local cvar_default_clip = CreateConVar("ttt_gungun_defaultclip", "50", {FCVAR_ARCHIVE, FCVAR_NOTIFY})
+local cvar_limited_stock = CreateConVar("ttt_gungun_limitedstock", "1", {FCVAR_ARCHIVE, FCVAR_NOTIFY})
 
 if SERVER then
+    AddCSLuaFile()
     resource.AddFile("materials/VGUI/ttt/icon_rpg.vmt")
 end
-
 
 if CLIENT then
     SWEP.PrintName = "The Gun Gun"
@@ -28,34 +25,31 @@ if CLIENT then
     }
 end
 
-
 SWEP.Base = "weapon_tttbase"
 SWEP.HoldType = "rpg"
+
+SWEP.Primary = {
+    Delay = cvar_delay:GetFloat(),
+    Automatic = cvar_automatic:GetBool(),
+    Ammo = "none",
+    ClipSize = cvar_clip_size:GetInt(),
+    ClipMax = cvar_clip_max:GetInt(),
+    DefaultClip = cvar_default_clip:GetInt()
+}
 
 SWEP.UseHands = true
 SWEP.ViewModel = "models/weapons/c_rpg.mdl"
 SWEP.WorldModel = "models/weapons/w_rocket_launcher.mdl"
 
-SWEP.Primary = {
-    Ammo = "none",
-    Automatic = cvar_automatic:GetBool(),
-    ClipMax = cvar_clip_max:GetInt(),
-    ClipSize = cvar_clip_size:GetInt(),
-    DefaultClip = cvar_default_clip:GetInt(),
-    Delay = cvar_delay:GetFloat()
-}
-
 SWEP.AllowDrop = true
+SWEP.AmmoEnt = "none"
 SWEP.AutoSpawnable = false
 SWEP.CanBuy = { ROLE_TRAITOR }
-SWEP.LimitedStock = cvar_limited_stock:GetBool()
 SWEP.InLoadoutFor = nil
-
-SWEP.AmmoEnt = "none"
 SWEP.IsSilent = false
 SWEP.Kind = WEAPON_EQUIP1
+SWEP.LimitedStock = cvar_limited_stock:GetBool()
 SWEP.NoSights = true
-
 
 function SWEP:PrimaryAttack()
     if not self:CanPrimaryAttack() then return end
