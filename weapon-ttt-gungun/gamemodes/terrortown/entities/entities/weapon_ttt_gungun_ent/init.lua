@@ -29,15 +29,19 @@ function ENT:Initialize()
     self:SetMoveType(MOVETYPE_VPHYSICS)
     self:SetSolid(SOLID_VPHYSICS)
 
-    if not SERVER then return end
+    if SERVER then
+		self:PhysicsInit(SOLID_VPHYSICS)
+		self:PrecacheGibs()
+	end
 
-    self:PrecacheGibs()
-    self:PhysicsInit(SOLID_VPHYSICS)
-    self:PhysWake()
-	self:SetUseType(SIMPLE_USE)
-
+    local gun_damage = self.Damage
     local gun_sound = self.GunSound
-    local damage = self.Damage
+	local phys = self:GetPhysicsObject()
+	if IsValid(phys) then
+		phys:Wake()
+	end
+
+	self:SetUseType(SIMPLE_USE)
 
     for i = 1, 60 do
         timer.Simple((i / 3) * math.Rand(1, 5), function()
@@ -45,22 +49,18 @@ function ENT:Initialize()
 
             self:EmitSound(gun_sound)
 
-            local phys = self:GetPhysicsObject()
-            if IsValid(phys) then
-                local ang = phys:GetAngles()
-                phys:ApplyForceCenter(-ang:Forward() * 250)
-                phys:ApplyForceOffset(VectorRand() * 200, phys:GetPos())
-            end
-			
-			local effectdata = EffectData()
-			effectdata:SetOrigin( self:GetAttachment( 1 ).Pos )
-			effectdata:SetAngles( self:GetAngles() )
-			effectdata:SetEntity( self )
-			effectdata:SetAttachment( 1 )
-			util.Effect( "MuzzleEffect", effectdata )
+			phys:ApplyForceCenter(-phys:GetAngles():Forward() * 250)
+			phys:ApplyForceOffset(VectorRand() * 200, phys:GetPos())
+
+			local effect_data = EffectData()
+			effect_data:SetOrigin(self:GetAttachment(1).Pos)
+			effect_data:SetAngles(self:GetAngles())
+			effect_data:SetEntity(self)
+			effect_data:SetAttachment(1)
+			util.Effect("MuzzleEffect", effect_data)
 
             self:FireBullets({
-                Damage = damage,
+                Damage = gun_damage,
                 Dir = self:GetAngles():Forward(),
                 Src = self:GetPos()
             })
@@ -71,11 +71,13 @@ function ENT:Initialize()
         if not IsValid(self) then return end
 
         self:EmitSound("physics/metal/metal_box_break" .. math.random(1, 2) .. ".wav")
-        util.Effect("StunstickImpact", EffectData()
-            :SetOrigin(self:GetPos())
-            :SetAngles(self:GetAngles())
-            :SetEntity(self)
-        )
+		
+		local effect_data = EffectData()
+		effect_data:SetOrigin(self:GetPos())
+		effect_data:SetAngles(self:GetAngles())
+		effect_data:SetEntity(self)
+		util.Effect("StunstickImpact", effect_data)
+
         self:Remove()
     end)
 end
